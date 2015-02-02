@@ -14,8 +14,6 @@ public class FractionSet
 {
 	//Internal list of fractions
 	private ArrayList<Fraction> fractions;
-	//Least common denominator/divisor (used for removeDenoms)
-	int lcd;
 
 	/**
 	 * Default constructor
@@ -57,17 +55,15 @@ public class FractionSet
 	 * Used to remove the denominators from all of the fractions
 	 */
 	public void removeDenoms()
-	{
-
-		//Set the lcd
-		lcd = fractions.get(0).getDenominator();
-		
+	{		
 		//Get the lcd
-		fractions.stream().forEach(f -> lcd = getLeastCommonMultiple(lcd, f.getDenominator()));
+		int lcd = fractions.stream()
+				.map(f -> f.getDenominator())
+				.reduce(1, (i1, i2) -> getLeastCommonMultiple(i1, i2));
 		
 		//Multiply all of the fractions by the collective lcd
 		for (int i = 0; i<fractions.size(); i++)
-			fractions.set(i, fractions.get(i).multiply(new Fraction(lcd, 1)));
+			fractions.set(i, fractions.get(i).multiply(new Fraction(lcd)));
 	}
 
 	private int getLeastCommonMultiple(int a, int b)

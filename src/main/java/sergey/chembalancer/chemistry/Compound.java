@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 
@@ -34,19 +35,13 @@ public class Compound
 		
 		//Split the string at the + signs
 		String[] cpndStrs = temp.split("\\+");
-		
-		//Create the list of compounds
-		Compound[] cpnds = new Compound[cpndStrs.length];
 
-		//Fill the array
-		for (int i=0; i<cpndStrs.length; i++) {
-			if (cpndStrs.equals("")) {
-				continue;
-			}
-			cpnds[i] = new Compound(cpndStrs[i]);
-		}
-
-		return cpnds;
+		//Create the array of compounds
+		return Arrays.stream(cpndStrs).parallel()
+				.filter(s -> !s.equals(""))
+				.map(s -> new Compound(s))
+				.collect(Collectors.toList())
+				.toArray(new Compound[] {});
 	}
 
 	//A single element. Formula: [UppercaseLetter][Lowercase letters(0-infinity amount)][Any number or no number]
@@ -164,14 +159,13 @@ public class Compound
 		//Set the number
 		number = num;
 
-		//Subcompounds
-		ArrayList<Compound> cpnds = new ArrayList<Compound>();
-		
-		//Java 8 trickery for adding all of the singles to the arraylist
-		Arrays.stream(singles).filter(s -> Compound.isValidCompound(s)).forEach(s -> cpnds.add(new Compound(s)));
-		
+		//Java 8 trickery for getting the compounds
 		//Set the subcompounds array
-		compounds = cpnds.toArray(new Compound[] {});
+		compounds = Arrays.stream(singles).parallel()
+				.filter(s -> Compound.isValidCompound(s))
+				.map(s -> new Compound(s))
+				.collect(Collectors.toList())
+				.toArray(new Compound[] {});
 	}
 	/**
 	 * Initialize an any compound
@@ -187,15 +181,14 @@ public class Compound
 		
 		//Set the number to 1
 		number = 1;
-
-		//Subcompounds
-		ArrayList<Compound> cpnds = new ArrayList<Compound>();
 		
-		//Java 8 trickery for adding all of the singles to the arraylist
-		Arrays.stream(makeup).filter(s -> Compound.isValidCompound(s)).forEach(s -> cpnds.add(new Compound(s)));
-
+		//Java 8 trickery for getting the compounds
 		//Set the subcompounds array
-		compounds = cpnds.toArray(new Compound[] {});
+		compounds = Arrays.stream(makeup).parallel()
+				.filter(s -> Compound.isValidCompound(s))
+				.map(s -> new Compound(s))
+				.collect(Collectors.toList())
+				.toArray(new Compound[] {});
 	}
 	/**
 	 * Initalize a better compound
